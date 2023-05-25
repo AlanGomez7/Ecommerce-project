@@ -2,7 +2,6 @@ const cloudinary = require("../utils/cloundinary");
 const createError = require("http-errors");
 const adminHelpers = require("../helpers/adminHelper");
 const couponHelpers = require("../helpers/couponHelper");
-const invoiceHelpers = require("../utils/invoice");
 const productHelpers = require("../helpers/productHelper");
 const authSchema = require("../models/authmodel");
 const userHelper = require("../helpers/userHelper");
@@ -111,48 +110,6 @@ module.exports = {
       pageSize,
       result: 0,
     });
-  },
-
-  downloadInvoice: async (req, res) => {
-    try {
-      const products = await adminHelpers.getOrderProducts(req.params.id);       
-    
-      for (let i = 0; i < products.length; i++) {
-        let data = {
-          quantity: products[i].quantity,
-          description: products[i].product.title,
-          "tax-rate": 0,
-          price: products[i].product.price,
-        };
-        invoiceHelpers.data.products.push(data);
-      }
-      invoiceHelpers.generateInvoice();
-      res.json({ status: true });
-    } catch (err) {
-      res.json({ status: false });
-    }
-  },
-
-  downloadReport: async (req, res) => {
-    try {
-      let order = await adminHelpers.getDeliveredOrders();
-      for (let i = 0; i < order.length; i++) {
-        let data = {
-          name: order[i].quantity,
-          description: order[i].paymenthMethod,
-          "tax-rate": 6,
-          price: order[i].total,
-        };
-        invoiceHelpers.data.products.push(data);
-      }
-      invoiceHelpers.generateInvoice();
-
-      res.json({ status: true });
-    } catch (err) {
-      console.log(err);
-      res.json({ status: false });
-    }
-
   },
 
   orderDetails: async (req, res) => {
